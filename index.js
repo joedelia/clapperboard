@@ -15,7 +15,8 @@ export default function animator(obj, timeline, callback = null, infinite = true
   let previousEnd = 0,
     previousStart = 0,
     framesLeft = timeline.length,
-    taggedSecs = {};
+    taggedSecs = {},
+    done = false;
   for (let frame of timeline) {
     let [secs, property, value, method] = frame,
       tag = null;
@@ -30,18 +31,18 @@ export default function animator(obj, timeline, callback = null, infinite = true
     }
     previousStart = secs;
     if (dot.pick(property, obj) && method === 'type') {
-      let removedChargs = 0,
+      let removedChars = 0,
         original = dot.pick(property, obj) || '',
         addedChars = 0,
         offset = differenceOffset(dot.pick(property, obj), value);
 
       if (original.length > offset)
-        removedChargs = original.length - offset;
+        removedChars = original.length - offset;
 
       if (value.length > offset)
         addedChars = value.length - offset;
 
-      previousEnd = ((removedChargs + addedChars) * 0.07) + secs;
+      previousEnd = ((removedChars + addedChars) * 0.07) + secs;
     } else {
       previousEnd = method === 'type' ? ((value.length * 0.07) + secs) : secs;
     }
@@ -50,6 +51,8 @@ export default function animator(obj, timeline, callback = null, infinite = true
 
     setTimeout((function (property, value, method) {
       return function () {
+        if(done) return;
+
         if (value === undefined) {
           dot.del(property, obj);
         } else if (method === 'type') {
@@ -61,6 +64,8 @@ export default function animator(obj, timeline, callback = null, infinite = true
             for (let char = original.length; char >= offset; char--) {
               framesLeft++;
               setTimeout(function () {
+                if(done) return;
+        
                 dot.str(property, original.substring(0, char), obj);
                 if (callback) callback(obj);
                 framesLeft--;
@@ -74,6 +79,8 @@ export default function animator(obj, timeline, callback = null, infinite = true
             for (let char = offset; char <= value.length; char++) {
               framesLeft++;
               setTimeout(function () {
+                if(done) return;
+        
                 dot.str(property, value.substring(0, char), obj);
                 if (callback) callback(obj);
                 framesLeft--;
@@ -92,5 +99,9 @@ export default function animator(obj, timeline, callback = null, infinite = true
           animator(obj, timeline, callback, infinite);
       };
     })(property, value, method), secs * 1000);
+  }
+
+  return function () {
+    done = true;
   }
 }
