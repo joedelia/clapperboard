@@ -66,7 +66,7 @@ Simple example of animating a browser:
     // ... all the frames here
   ];
 
-  animator(initialState, animation, function (obj) {
+  const [stop, onEnd] = animator(initialState, timeline, function (obj) {
       component.setState(obj);
   });
 ```
@@ -105,7 +105,9 @@ The animator function will need to be called with:
 - `initialState`: the object frames will apply changes to
 - `frames`: the list of frames
 - `callback`: a function to call after each change. It will be called with the changed object as only argument
-- (optionally) `infinite`: A boolean to determine whether to run the animation as a loop (defaults to `true`)
+- `infinite (optional)`: set to false to only run the animation once
+
+It will return a function `stop` which you can use to stop the animation.
 
 ## Big disclaimer
 I'm pretty sure this stuff works, but not 100% sure. I have extracted it from an old project
