@@ -20,7 +20,7 @@ export default function animator(initialObject, timeline, callback, infinite = t
   setTimeout(async () => {
     while (!done) { // eslint-disable-line no-unmodified-loop-condition
       const taggedSecs = {},
-        object = cloneDeep(initial);
+        object = cloneDeep(initialObject);
       let framesLeft = timeline.length,
         previousEnd = 0,
         previousStart = 0,

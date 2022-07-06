@@ -1,6 +1,6 @@
 {
   "name": "clapperboard",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Easily set frames to create an animation rendered from an object (like the state of a react component).",
   "main": "index.js",
   "repository": {
