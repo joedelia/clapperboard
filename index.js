@@ -1,4 +1,6 @@
 import dot from 'dot-object';
+import { initial } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 dot.override = true;
 
@@ -18,7 +20,7 @@ export default function animator(initialObject, timeline, callback, infinite = t
   setTimeout(async () => {
     while (!done) { // eslint-disable-line no-unmodified-loop-condition
       const taggedSecs = {},
-        object = {...initialObject};
+        object = cloneDeep(initial);
       let framesLeft = timeline.length,
         previousEnd = 0,
         previousStart = 0,
