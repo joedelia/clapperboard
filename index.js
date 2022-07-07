@@ -1,6 +1,5 @@
 import dot from 'dot-object';
-import { initial } from 'lodash';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 
 dot.override = true;
 
@@ -30,7 +29,8 @@ export default function animator(initialObject, timeline, callback, infinite = t
 
       for (const frame of timeline) {
         let [secs, property, value, method] = frame,
-          tag = null;
+          tag = null,
+          methodTime = null;
         if (secs.toString().includes(':'))
           [secs, tag] = secs.split(':');
 
@@ -42,6 +42,11 @@ export default function animator(initialObject, timeline, callback, infinite = t
         }
 
         previousStart = secs;
+        if (method && method.startsWith('type')) {
+          methodTime = Number.parseFloat(method.split(':')[1] || '0.07');
+          method = 'type';
+        }
+
         if (dot.pick(property, object) && method === 'type') {
           const original = dot.pick(property, object) || '',
             offset = differenceOffset(dot.pick(property, object), value);
@@ -55,9 +60,9 @@ export default function animator(initialObject, timeline, callback, infinite = t
           if (value.length > offset)
             addedChars = value.length - offset;
 
-          previousEnd = ((removedChars + addedChars) * 0.07) + secs;
+          previousEnd = ((removedChars + addedChars) * methodTime) + secs;
         } else {
-          previousEnd = method === 'type' ? ((value.length * 0.07) + secs) : secs;
+          previousEnd = method === 'type' ? ((value.length * methodTime) + secs) : secs;
         }
 
         if (tag)
@@ -83,7 +88,7 @@ export default function animator(initialObject, timeline, callback, infinite = t
                   callback(object);
                   framesLeft--;
                   if (framesLeft === 0) loopDone();
-                }, 70 * changesCount);
+                }, methodTime * changesCount * 1000);
                 changesCount++;
               }
             }
@@ -98,7 +103,7 @@ export default function animator(initialObject, timeline, callback, infinite = t
                   callback(object);
                   framesLeft--;
                   if (framesLeft === 0) loopDone();
-                }, 70 * changesCount);
+                }, methodTime * changesCount * 1000);
                 changesCount++;
               }
             }
